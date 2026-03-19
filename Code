@@ -1,0 +1,25 @@
+# Step 1: Create the class (blueprint)
+class Student:
+    # attributes (data)
+    name = ""
+    age = 0
+    
+    # method (behavior)
+    def study(self):
+        print(self.name + " is studying now.")
+
+# Step 2: Create objects (real students)
+student1 = Student()           # first object
+student1.name = "Grace"
+student1.age = 19
+
+student2 = Student()           # second object
+student2.name = "Kevin"
+student2.age = 21
+
+# Use the objects
+print(student1.name, "is", student1.age, "years old")
+student1.study()
+
+print(student2.name, "is", student2.age, "years old")
+student2.study()
