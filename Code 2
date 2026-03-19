@@ -1,0 +1,28 @@
+class Car:
+    # Constructor - runs automatically when we create object
+    def __init__(self, brand, color, year):
+        self.brand = brand
+        self.color = color
+        self.year = year
+        print(f"New car created → {self.brand} ({self.color}, {self.year})")
+
+    # Normal method
+    def drive(self):
+        print(f"{self.brand} is driving on the road!")
+
+    # Destructor - runs when object is deleted or program ends
+    def __del__(self):
+        print(f"Car {self.brand} is being destroyed / cleaned up")
+
+
+# Create objects (constructor runs automatically)
+car1 = Car("Toyota", "Silver", 2023)
+car2 = Car("Honda", "Red", 2022)
+
+car1.drive()
+car2.drive()
+
+# We can manually delete an object (destructor may run)
+del car1
+
+# When function or program ends → car2 will also be destroyed
