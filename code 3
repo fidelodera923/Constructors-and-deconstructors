@@ -1,0 +1,54 @@
+class Book:
+    # Constructor - runs automatically when we create a new book
+    def __init__(self, title, author, pages):
+        self.title = title
+        self.author = author
+        self.pages = pages
+        self.is_open = False           # starts closed
+        print(f"New book created: '{self.title}' by {self.author} ({self.pages} pages)")
+
+    # Normal methods (what the book can do)
+    def open_book(self):
+        if not self.is_open:
+            self.is_open = True
+            print(f"Opened '{self.title}' → enjoy reading!")
+        else:
+            print(f"'{self.title}' is already open.")
+
+    def close_book(self):
+        if self.is_open:
+            self.is_open = False
+            print(f"Closed '{self.title}'")
+        else:
+            print(f"'{self.title}' is already closed.")
+
+    # Destructor - runs when the book object is destroyed
+    def __del__(self):
+        if self.is_open:
+            print(f"WARNING: '{self.title}' was still open when it got destroyed!")
+        print(f"Book '{self.title}' has been removed / thrown away")
+
+
+# --- Let's use it ---
+print("Starting the program...\n")
+
+# Create two books (constructor runs automatically)
+book1 = Book("The Python Guide", "Anna Smith", 320)
+book2 = Book("Harry Potter", "J.K. Rowling", 450)
+
+print("\nPlaying with book1:")
+book1.open_book()
+book1.open_book()      # try opening again → should say already open
+book1.close_book()
+
+print("\nPlaying with book2:")
+book2.open_book()
+
+# Manually delete book1 (destructor should run)
+print("\nDeleting book1 now...")
+del book1
+
+# book2 still exists (still open)
+print("\nEnd of main part — book2 still exists...\n")
+
+# When the program ends, book2 will be automatically destroyed too
