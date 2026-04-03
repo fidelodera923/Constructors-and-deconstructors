@@ -1,0 +1,149 @@
+class BankAccount:
+    """Base class for Bank Account as per assignment starter code."""
+
+    def __init__(self, acc_num, holder, init_balance, pin):
+        """Initialize BankAccount with strict validation."""
+        # Account number must be string
+        if not isinstance(acc_num, str):
+            acc_num = str(acc_num)
+        self.acc_num = acc_num
+
+        # Account holder validation
+        if not isinstance(holder, str) or not holder.strip():
+            raise ValueError("Account holder must be a valid non-empty string.")
+        self.holder = holder.strip()
+
+        # Initial balance validation
+        if not isinstance(init_balance, (int, float)) or init_balance < 0:
+            raise ValueError("Initial balance must be a non-negative number.")
+        self.balance = float(init_balance)
+
+        # PIN validation: must be exactly 4 digits
+        if not isinstance(pin, int) or len(str(pin)) != 4:
+            raise ValueError("PIN must be a 4-digit integer.")
+
+        self.pin = pin
+
+    def validate_amount(self, amount):
+        """Validate that amount is a positive number (not string, not <= 0)."""
+        if not isinstance(amount, (int, float)):
+            return False
+        if amount <= 0:
+            return False
+        return True
+
+    def deposit(self, amount):
+        """Deposit money into the account."""
+        if not self.validate_amount(amount):
+            return False
+        self.balance += float(amount)
+        return True
+
+    def withdraw(self, amount, pin):
+        """Withdraw money with PIN verification and balance check."""
+        if self.pin != pin:
+            return False
+        if not self.validate_amount(amount):
+            return False
+        if amount > self.balance:
+            return False
+        self.balance -= float(amount)
+        return True
+
+    def get_balance(self):
+        """Return current account balance."""
+        return self.balance
+
+    def transfer(self, recipient, amount, pin):
+        """Transfer money to another account with PIN verification."""
+        if self.pin != pin:
+            return False
+        if not self.validate_amount(amount):
+            return False
+        if amount > self.balance:
+            return False
+        if not isinstance(recipient, BankAccount):
+            return False
+
+        self.balance -= float(amount)
+        recipient.deposit(amount)
+        return True
+
+    def __str__(self):
+        return f"Account: {self.acc_num} | Holder: {self.holder} | Balance: ${self.balance:.2f}"
+
+class SavingsAccount(BankAccount):
+    """Savings Account with minimum balance requirement (Bonus Challenge)."""
+
+    def __init__(self, acc_num, holder, init_balance, pin, interest_rate=0.02, min_balance=100.0):
+        super().__init__(acc_num, holder, init_balance, pin)
+        self.interest_rate = interest_rate
+        self.min_balance = float(min_balance)
+
+    def withdraw(self, amount, pin):
+        """Override withdraw to enforce minimum balance."""
+        if self.balance - amount < self.min_balance:
+            print(f"❌ Withdrawal denied: Must maintain minimum balance of ${self.min_balance:.2f}")
+            return False
+        return super().withdraw(amount, pin)
+
+    def apply_interest(self):
+        """Apply interest if minimum balance is maintained."""
+        if self.balance >= self.min_balance:
+            interest = self.balance * self.interest_rate
+            self.balance += interest
+            print(f"✅ Interest applied: +${interest:.2f}")
+            return True
+        return False
+
+
+class CheckingAccount(BankAccount):
+    """Checking Account - No minimum balance (Bonus Challenge)."""
+    pass  # Inherits all functionality from BankAccount
+
+class Bank:
+    """Central Bank system to manage multiple accounts (Bonus Challenge)."""
+
+    def __init__(self):
+        self.accounts = {}  # Dictionary to store accounts: {acc_num: account_object}
+
+    def create_account(self, acc_type, acc_num, holder, init_balance, pin, **kwargs):
+        """Create a new account (Savings or Checking)."""
+        if acc_num in self.accounts:
+            print(f"❌ Account {acc_num} already exists!")
+            return None
+
+        try:
+            if acc_type.lower() == "savings":
+                account = SavingsAccount(acc_num, holder, init_balance, pin, **kwargs)
+            elif acc_type.lower() == "checking":
+                account = CheckingAccount(acc_num, holder, init_balance, pin)
+            else:
+                account = BankAccount(acc_num, holder, init_balance, pin)
+
+            self.accounts[acc_num] = account
+            print(f"✅ Account created: {account}")
+            return account
+
+        except ValueError as e:
+            print(f"❌ Account creation failed: {e}")
+            return None
+
+    def delete_account(self, acc_num, pin):
+        """Delete an account after verifying PIN."""
+        if acc_num not in self.accounts:
+            print("❌ Account not found!")
+            return False
+
+        account = self.accounts[acc_num]
+        if account.pin != pin:
+            print("❌ Incorrect PIN. Deletion denied!")
+            return False
+
+        del self.accounts[acc_num]
+        print(f"✅ Account {acc_num} deleted successfully.")
+        return True
+
+    def get_account(self, acc_num):
+        """Retrieve account by account number."""
+        return self.accounts.get(acc_num)
